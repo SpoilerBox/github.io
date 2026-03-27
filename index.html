@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Lorenzo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0; padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      background: #F2F2F7;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 34px) env(safe-area-inset-left, 0);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 0 0 100px;
+    }
+
+    /* Header */
+    .header {
+      padding: 28px 20px 10px;
+      background: #F2F2F7;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1C1C1E;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .header h1 span {
+      color: #FF3B30;
+    }
+
+    /* Task list */
+    #tasks-container {
+      padding: 12px 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-card {
+      background: #FFFFFF;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      animation: slideIn 0.22s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-num {
+      width: 42px;
+      background: #FF3B30;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
+    }
+
+    textarea {
+      flex: 1;
+      min-height: 80px;
+      padding: 14px 12px 14px 12px;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      border: none;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: #1C1C1E;
+      line-height: 1.5;
+      -webkit-appearance: none;
+    }
+
+    textarea::placeholder {
+      color: #C7C7CC;
+    }
+
+    .remove-btn {
+      width: 44px;
+      border: none;
+      background: transparent;
+      color: #C7C7CC;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 12px;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+
+    .remove-btn:active { color: #FF3B30; }
+
+    /* Add button */
+    #add-btn {
+      margin: 10px 20px 0;
+      width: calc(100% - 40px);
+      padding: 15px;
+      background: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #FF3B30;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: opacity 0.15s;
+    }
+
+    #add-btn:active { opacity: 0.6; }
+
+    .add-icon {
+      width: 22px; height: 22px;
+      background: #FF3B30;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    /* Save button */
+    #save-btn {
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 20px) + 16px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 40px);
+      max-width: 390px;
+      padding: 17px;
+      background: #FF3B30;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255,59,48,0.35);
+      transition: transform 0.1s, opacity 0.15s;
+      letter-spacing: -0.1px;
+    }
+
+    #save-btn:active { transform: translateX(-50%) scale(0.97); }
+    #save-btn:disabled { background: #C7C7CC; box-shadow: none; }
+
+    /* Banner */
+    #banner {
+      display: none;
+      margin: 12px 20px 0;
+      padding: 16px 18px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.4;
+      text-align: center;
+      animation: slideIn 0.2s ease;
+    }
+
+    .banner-processing {
+      background: #EFF6FF;
+      color: #1D4ED8;
+    }
+
+    .banner-busy {
+      background: #FFF7ED;
+      color: #C2410C;
+    }
+
+    .banner-emoji {
+      font-size: 26px;
+      display: block;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <h1>Cose da far fare<br>a <span>Lorenzo</span></h1>
+    </div>
+
+    <div id="tasks-container"></div>
+
+    <button id="add-btn" onclick="addTask()">
+      <span class="add-icon">+</span>
+      Aggiungi un'altra cosa
+    </button>
+
+    <div id="banner"></div>
+  </div>
+
+  <button id="save-btn" onclick="salva()">Salva</button>
+
+  <script>
+    let count = 0;
+
+    function addTask() {
+      count++;
+      const container = document.getElementById('tasks-container');
+
+      const card = document.createElement('div');
+      card.className = 'task-card';
+
+      const num = document.createElement('div');
+      num.className = 'task-num';
+      num.textContent = count;
+
+      const ta = document.createElement('textarea');
+      ta.placeholder = 'Scrivi cosa deve fare…';
+      ta.setAttribute('enterkeyhint', 'done');
+      ta.oninput = () => {
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(80, ta.scrollHeight) + 'px';
+      };
+
+      const rm = document.createElement('button');
+      rm.className = 'remove-btn';
+      rm.textContent = '×';
+      rm.onclick = () => {
+        if (document.querySelectorAll('.task-card').length > 1) {
+          card.remove();
+          renumber();
+        }
+      };
+
+      card.appendChild(num);
+      card.appendChild(ta);
+      card.appendChild(rm);
+      container.appendChild(card);
+
+      setTimeout(() => ta.focus(), 50);
+    }
+
+    function renumber() {
+      document.querySelectorAll('.task-num').forEach((el, i) => {
+        el.textContent = i + 1;
+      });
+      count = document.querySelectorAll('.task-card').length;
+    }
+
+    function salva() {
+      const banner = document.getElementById('banner');
+      const btn = document.getElementById('save-btn');
+
+      btn.disabled = true;
+      btn.textContent = '…';
+
+      banner.className = 'banner-processing';
+      banner.style.display = 'block';
+      banner.innerHTML = '<span class="banner-emoji">⏳</span>Ordine in elaborazione…';
+
+      setTimeout(() => {
+        banner.className = 'banner-busy';
+        banner.innerHTML = '<span class="banner-emoji">😅</span>Al momento Lorenzo è occupato';
+        btn.disabled = false;
+        btn.textContent = 'Salva';
+      }, 5000);
+    }
+
+    addTask();
+  </script>
+</body>
+</html>
